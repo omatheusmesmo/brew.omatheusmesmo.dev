@@ -1,0 +1,26 @@
+# Build output
+target/
+build/
+out/
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Quarkus
+.quarkus/
+
+# Node.js (if using web bundler)
+node_modules/
+package-lock.json
+
+# Logs
+*.log

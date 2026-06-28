@@ -1,0 +1,26 @@
+---
+title: "Tags"
+description: "Browse all tags"
+layout: base
+---
+
+<div class="brew-column">
+  <header class="brew-header">
+    <div class="brew-masthead">
+      <p class="brew-title">Matheus' Brew</p>
+      <div class="brew-divider"></div>
+      <p class="brew-tagline">Browse by tag</p>
+    </div>
+  </header>
+
+  <div class="brew-content">
+    <div class="tag-cloud">
+      {#for tag in site.collections.brews.tagsCount}
+        <a href="/brews/tag/{tag.name}/" class="tag-chip">
+          {tag.name}
+          <span class="tag-count">{tag.count}</span>
+        </a>
+      {/for}
+    </div>
+  </div>
+</div>

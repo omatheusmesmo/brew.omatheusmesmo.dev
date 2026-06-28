@@ -1,0 +1,80 @@
+---
+title: "Matheus' Brew"
+description: "A curated newsletter with the most interesting tech finds from around the internet."
+layout: base
+icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☕</text></svg>"
+---
+
+<div class="brew-column">
+  <header class="brew-header home-header">
+    <div class="brew-masthead">
+      <p class="brew-title">Matheus' Brew</p>
+      <div class="brew-divider"></div>
+      <p class="brew-tagline">Every edition brings handpicked articles, tools, platforms, talks, book insights, and a nerd corner with technical curiosities, plus one standout highlight.</p>
+    </div>
+  </header>
+
+  <div class="brew-content">
+    <section class="home-hero">
+      <div class="highlight-card brew-card">
+        <span class="highlight-badge">What is this?</span>
+        <p class="highlight-title">Hand-curated, every edition</p>
+        <p class="highlight-desc">
+          No algorithms, no scraping, no automation. Every link in the Brew is read, tested, and annotated by hand. One person's taste, one newsletter: the same care you would expect from a friend sharing something that is actually worth your time.
+        </p>
+      </div>
+    </section>
+
+    <h2 class="section-header">Brew categories</h2>
+    <div class="category-grid">
+      <div class="category-card">
+        <div class="category-card-header"><span class="category-emoji">🔥</span> <strong>Highlight</strong></div>
+        <p class="category-desc">The most important link of the edition.</p>
+      </div>
+      <div class="category-card">
+        <div class="category-card-header"><span class="category-emoji">📚</span> <strong>Articles</strong></div>
+        <p class="category-desc">Blog posts, deep dives, and technical reads.</p>
+      </div>
+      <div class="category-card">
+        <div class="category-card-header"><span class="category-emoji">🛠</span> <strong>Tools</strong></div>
+        <p class="category-desc">Developer tools worth trying or watching.</p>
+      </div>
+      <div class="category-card">
+        <div class="category-card-header"><span class="category-emoji">☁️</span> <strong>Platforms</strong></div>
+        <p class="category-desc">Infrastructure, cloud services, and platforms.</p>
+      </div>
+      <div class="category-card">
+        <div class="category-card-header"><span class="category-emoji">💻</span> <strong>Languages &amp; Frameworks</strong></div>
+        <p class="category-desc">Programming languages, frameworks, and libraries.</p>
+      </div>
+      <div class="category-card">
+        <div class="category-card-header"><span class="category-emoji">📖</span> <strong>Books Insights</strong></div>
+        <p class="category-desc">Useful ideas pulled from technical books.</p>
+      </div>
+      <div class="category-card">
+        <div class="category-card-header"><span class="category-emoji">🧠</span> <strong>Nerd Corner</strong></div>
+        <p class="category-desc">Curiosities, deep cuts, and technical rabbit holes.</p>
+      </div>
+      <div class="category-card">
+        <div class="category-card-header"><span class="category-emoji">🎬</span> <strong>Videos</strong></div>
+        <p class="category-desc">Talks, conference recordings, and video content.</p>
+      </div>
+    </div>
+
+    <h2 class="section-header">Latest Brew</h2>
+    {#if site.collections.brews}
+      {#let latest = site.collections.brews.sortByDate(true).first}
+        {#if latest}
+          <article class="brew-card">
+            <p class="card-date">{latest.date.format('MMM d, yyyy')}</p>
+            <h3 class="card-title"><a href="{latest.url}">{latest.title}</a></h3>
+            <p class="card-desc">{latest.description}</p>
+          </article>
+          <p style="text-align:center; margin: 24px 0 0;">
+            <a class="cta-button" href="/brews/">View all brews</a>
+          </p>
+        {/if}
+      {/let}
+    {/if}
+  </div>
+</div>

@@ -1,0 +1,526 @@
+:root {
+    --brew-primary: #B07219;
+    --brew-primary-dark: #8C5A14;
+    --brew-primary-text: #8C5A14;
+    --brew-bg: #FAF8F5;
+    --brew-text: #6E5C4A;
+    --brew-column-bg: #FFFFFF;
+    --brew-card-bg: #F5F0EB;
+    --brew-card-border: #D4A853;
+    --brew-border: #EDE8E1;
+    --brew-muted: #8B7D6B;
+}
+
+[data-theme="dark"] {
+    --brew-bg: #332D27;
+    --brew-text: #C4B8A8;
+    --brew-primary-text: #B88A3B;
+    --brew-column-bg: #3D3731;
+    --brew-card-bg: #322C27;
+    --brew-card-border: #8A7340;
+    --brew-border: #4D453C;
+    --brew-muted: #9E9488;
+    --brew-primary: #B88A3B;
+    --brew-primary-dark: #9E7035;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    background: var(--brew-bg);
+    color: var(--brew-text);
+    line-height: 1.7;
+    background-image: radial-gradient(circle, var(--brew-border) 0.5px, transparent 0.5px);
+    background-size: 24px 24px;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+a { color: var(--brew-primary); text-decoration: underline; }
+a:hover { color: var(--brew-primary-dark); }
+
+/* Navigation */
+.brew-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.brew-nav-links {
+    display: flex;
+    gap: 24px;
+}
+
+.brew-nav-links a {
+    text-decoration: none;
+    color: var(--brew-text);
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.brew-nav-links a:hover {
+    color: var(--brew-primary);
+}
+
+.theme-toggle {
+    background: var(--brew-card-bg);
+    border: 1px solid var(--brew-primary);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.theme-toggle:hover {
+    background: var(--brew-primary);
+    color: white;
+}
+
+.theme-toggle svg {
+    stroke: currentColor;
+}
+
+.sun-icon {
+    display: none;
+    color: inherit;
+}
+
+.moon-icon {
+    display: block;
+    color: inherit;
+}
+
+[data-theme="dark"] .sun-icon {
+    display: block;
+}
+
+[data-theme="dark"] .moon-icon {
+    display: none;
+}
+
+/* Masthead Header */
+@keyframes brew-enter {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.brew-column {
+    background: var(--brew-column-bg);
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    overflow: hidden;
+    animation: brew-enter 0.5s ease-out;
+}
+
+/* Homepage Header Modifier */
+.home-header {
+    text-align: center;
+}
+
+.home-header .brew-masthead {
+    display: block;
+}
+
+.home-header .brew-divider {
+    margin: 16px 0;
+    border-radius: 2px;
+}
+
+.home-header .brew-tagline {
+    font-style: normal;
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.7;
+}
+
+/* Brew Edition Header (gradient) */
+.brew-header {
+    background: linear-gradient(135deg, #B07219 0%, #8C5A14 100%);
+    padding: 24px;
+    margin: 0;
+    border-radius: 0;
+}
+
+.brew-masthead {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: start;
+}
+
+.brew-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: white;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.brew-issue {
+    font-size: 18px;
+    color: rgba(255,255,255,0.7);
+    font-weight: 300;
+}
+
+.brew-divider {
+    width: 100%;
+    height: 2px;
+    background: rgba(255,255,255,0.3);
+    margin: 12px 0;
+    grid-column: 1 / -1;
+}
+
+.brew-tagline {
+    grid-column: 1 / -1;
+    color: rgba(255,255,255,0.85);
+    font-style: italic;
+    font-size: 14px;
+}
+
+.brew-content {
+    padding: 2px 24px;
+}
+
+/* Brewed By Footer */
+.brew-footer {
+    padding: 0 24px 24px;
+}
+
+.brewed-by {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: var(--brew-card-bg);
+    border: 1px solid var(--brew-border);
+    border-radius: 12px;
+    text-decoration: none;
+}
+
+.brewed-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid var(--brew-primary);
+}
+
+.brewed-label {
+    font-size: 14px;
+    color: var(--brew-text);
+}
+
+.brewed-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--brew-primary-text);
+}
+
+/* Section Headers */
+h2 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--brew-primary);
+    margin: 20px 0 12px 0;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--brew-border);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+h2[data-section="highlight"]::before { content: "🔥 "; }
+h2[data-section="articles"]::before { content: "📚 "; }
+h2[data-section="tools"]::before { content: "🛠 "; }
+h2[data-section="platforms"]::before { content: "☁️ "; }
+h2[data-section="languages-frameworks"]::before { content: "💻 "; }
+h2[data-section="books-insights"]::before { content: "📖 "; }
+h2[data-section="videos"]::before { content: "🎬 "; }
+h2[data-section="nerd-corner"]::before { content: "🧠 "; }
+
+.giscus-comments h2::before { content: "💬 "; }
+
+/* Shared Card Base */
+.brew-card {
+    background: var(--brew-card-bg);
+    border-left: 3px solid var(--brew-card-border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin: 12px 0;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.brew-card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    transform: translateY(-1px);
+}
+
+/* Highlight Modifier */
+.highlight-card {
+    border-left: 4px solid var(--brew-primary);
+    padding: 20px 24px;
+}
+
+.highlight-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--brew-primary) 0%, var(--brew-primary-dark) 100%);
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+}
+
+.highlight-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--brew-primary);
+    line-height: 1.3;
+    margin: 0 0 8px 0;
+}
+
+.highlight-desc {
+    font-size: 15px;
+    color: var(--brew-primary-text);
+    line-height: 1.7;
+    margin: 0;
+}
+
+/* Link Card Typography */
+.link-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--brew-primary-text);
+    line-height: 1.3;
+    margin: 0 0 6px 0;
+}
+
+.link-url {
+    font-size: 12px;
+    color: var(--brew-primary);
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+    word-break: break-all;
+    margin: 0 0 10px 0;
+}
+
+.link-url a {
+    color: var(--brew-primary);
+    text-decoration: none;
+    border-bottom: 1px solid var(--brew-card-border);
+}
+
+.link-description {
+    font-size: 14px;
+    color: var(--brew-text);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Comment Bubble */
+.comment-bubble-container {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 12px;
+    margin: 12px 0 20px 0;
+    padding-right: 10px;
+}
+
+.comment-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid var(--brew-bg);
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.comment-bubble {
+    background: var(--brew-primary);
+    color: white;
+    padding: 14px 18px;
+    border-radius: 18px 4px 18px 18px;
+    max-width: 85%;
+    font-size: 14px;
+    font-style: italic;
+    line-height: 1.5;
+}
+
+/* Nerd Corner Modifier */
+.nerd-corner {
+    border-left-color: var(--brew-primary-dark);
+}
+
+.nerd-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--brew-primary-dark);
+    margin: 0 0 6px 0;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+.nerd-text {
+    font-size: 14px;
+    color: var(--brew-text);
+    line-height: 1.7;
+    margin: 0;
+}
+
+/* Homepage */
+.home-hero {
+    padding: 0 0 10px;
+}
+
+/* Category Grid */
+.category-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.category-card {
+    background: var(--brew-card-bg);
+    border: 1px solid var(--brew-border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+
+.category-card:hover {
+    border-color: var(--brew-card-border);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transform: translateY(-1px);
+}
+
+.category-card-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+
+.category-emoji {
+    font-size: 14px;
+    line-height: 1;
+}
+
+.category-card-header strong {
+    font-size: 14px;
+    color: var(--brew-primary-text);
+}
+
+.category-desc {
+    font-size: 13px;
+    color: var(--brew-text);
+    line-height: 1.4;
+    margin: 0;
+}
+
+/* Latest Brew Card */
+.card-date {
+    font-size: 12px;
+    color: var(--brew-primary);
+    margin-bottom: 4px;
+}
+
+.card-title {
+    font-size: 18px;
+    margin-bottom: 8px;
+}
+
+.card-title a {
+    color: var(--brew-primary-text);
+    text-decoration: none;
+}
+
+.card-title a:hover {
+    color: var(--brew-primary);
+}
+
+.card-desc {
+    font-size: 14px;
+    color: var(--brew-text);
+    line-height: 1.6;
+}
+
+/* Tag Cloud */
+.tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tag-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 12px;
+    background: var(--brew-card-bg);
+    border: 1px solid var(--brew-border);
+    border-radius: 20px;
+    font-size: 13px;
+    color: var(--brew-text);
+    text-decoration: none;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.tag-chip:hover {
+    border-color: var(--brew-primary);
+    background: var(--brew-card-bg);
+}
+
+.tag-count {
+    font-size: 11px;
+    color: var(--brew-muted);
+    background: var(--brew-bg);
+    padding: 1px 6px;
+    border-radius: 10px;
+}
+.cta-button {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--brew-primary) 0%, var(--brew-primary-dark) 100%);
+    color: white;
+    padding: 14px 32px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.cta-button:hover {
+    color: white;
+}
+
+/* Giscus Comments Section */
+.giscus-comments {
+    padding: 0 24px 24px;
+    border-top: 0;
+}
+
+.giscus-comments h2 {
+    font-size: 20px;
+    margin-bottom: 16px;
+    color: var(--brew-primary-dark);
+    border-top: 2px solid var(--brew-border);
+    padding-top: 20px;
+}
+
+.giscus-comments iframe {
+    width: 100%;
+}

@@ -1,0 +1,27 @@
+---
+title: "All Brews"
+description: "Browse all editions of Matheus' Brew newsletter."
+layout: page
+---
+
+<div class="brew-column">
+  <header class="brew-header">
+    <div class="brew-masthead">
+      <p class="brew-title">Matheus' Brew</p>
+      <div class="brew-divider"></div>
+      <p class="brew-tagline">All editions</p>
+    </div>
+  </header>
+
+  <div class="brew-content">
+    <div class="brews-list">
+      {#for post in site.collections.brews.sortByDate(true)}
+        <article class="brew-card">
+          <p class="card-date">{post.date.format('MMM d, yyyy')}</p>
+          <h3 class="card-title"><a href="{post.url}">{post.title}</a></h3>
+          <p class="card-desc">{post.description}</p>
+        </article>
+      {/for}
+    </div>
+  </div>
+</div>

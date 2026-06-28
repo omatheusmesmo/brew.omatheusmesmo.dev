@@ -1,0 +1,61 @@
+title: "Edition #01: Project Valhalla, Context Engineering & the hyper Lesson"
+description: "Project Valhalla arrives in JDK 28 after 12 years. Anthropic redefines how we build AI agents. Cloudflare's six-week debug of a four-line hyper bug. Plus: GitHub Actions parallel steps and the First Law of Software Architecture."
+date: 2026-07-01
+tags: [java, ai, rust, debugging, devops, architecture]
+issue: 1
+link: /brews/2026/07/01/
+layout: brew-post
+
+sections:
+  - name: "Highlight"
+    type: "highlight"
+    badge: "Must Read"
+    cards:
+      - title: "Project Valhalla: How a Decade of Work Arrives in JDK 28"
+        url: "https://www.jvm-weekly.com/p/project-valhalla-explained-how-a"
+        source: "jvm-weekly.com"
+        description: "After 12 years of development, Project Valhalla is finally coming to JDK 28. Value classes promise to bridge the gap between object-oriented programming and primitive performance, fundamentally changing how Java handles memory."
+        comment: "12 years, 5 prototypes, and one fundamental insight: let programmers opt out of identity. \"Codes like a class, works like an int.\" The motto survived every naming war (value types to inline classes to primitive classes to value classes). The JDK 28 preview is just phase one: null-restricted types, specialized generics, and 128-bit encodings are still ahead. This is why Java stays relevant in 2026: it never stops reinventing itself."
+
+  - name: "Articles"
+    type: "link"
+    cards:
+      - title: "Context Engineering: The Most Important Shift in AI Development"
+        url: "https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents"
+        source: "anthropic.com"
+        description: "Context engineering treats the context window as a design surface, not just a text box. This shift from prompt engineering to systematic context management is reshaping how we build AI agents."
+        comment: "Anthropic reframes AI engineering: context is a finite attention budget with diminishing returns. Compaction, structured note-taking, and sub-agent architectures will define the next generation of agents. If you are building with LLMs, this is the reference. That said, most developers already stumbled into these same patterns just by playing around with agents. Anthropic gave them a name, but the patterns were already there."
+      - title: "How Cloudflare Found a Bug in the hyper HTTP Library"
+        url: "https://blog.cloudflare.com/hyper-bug/"
+        source: "blog.cloudflare.com"
+        description: "A race condition in hyper's dispatch loop caused response data loss for larger images. Six weeks of debugging, kernel-level tracing with strace, and the fix was just four lines of code."
+        comment: "Honestly, I am tired of the AI hype. Reading a tech article with zero buzzwords (just real code, real debugging, real software engineering) feels like a breath of fresh air. Six weeks of investigation, zero application-level errors. strace cracked the case: a single `let _ =` discarding `Poll::Pending` hid 14.8 MB of lost data behind a 200 OK. Four lines fixed it. The lesson: making a system faster can wake up bugs that were always there, just never triggered."
+
+  - name: "Tools"
+    type: "link"
+    cards:
+      - title: "Cloudflare Security Audit Skill"
+        url: "https://github.com/cloudflare/security-audit-skill"
+        source: "github.com/cloudflare"
+        description: "A coding-agent skill that turns your agent into a security auditor. It coordinates multiple agents through a six-phase pipeline to find exploitable vulnerabilities with real impact."
+        comment: "Cloudflare open-sourced the skill that powers their internal vulnerability discovery. Six-phase pipeline, multi-agent coordination, focused on exploitable findings with real impact. If you are building coding agents, study this architecture."
+      - title: "GitHub Actions: Steps Can Now Be Run in Parallel"
+        url: "https://github.blog/changelog/2026-06-25-actions-steps-can-now-be-run-in-parallel/"
+        source: "github.blog"
+        description: "Four new keywords: `background`, `wait`/`wait-all`, `cancel`, and `parallel`. Run independent builds concurrently, start background services, and stop them cleanly."
+        comment: "`background`, `wait`, `cancel`, and `parallel`: four new keywords that replace shell backgrounding hacks. Each step keeps its own logs and exit code. The `parallel` block is syntactic sugar for \"run these concurrently, then continue.\" Simple, overdue, and immediately useful."
+
+  - name: "Books Insights"
+    type: "nerd"
+    cards:
+      - title: "The First Law of Software Architecture"
+        text: "From the book The Fundamentals of Software Architecture by Mark Richards and Neal Ford: \"Everything in software architecture is a trade-off.\" That is the foundation of architectural thinking. Every decision involves trade-offs; there is no pure solution. If you think you found one, you probably have not identified the trade-off yet."
+        comment: "Richards and Ford built an entire book around one sentence. Every architectural decision is a negotiation. If you think you found a solution with no downside, look harder. We all have favorite patterns, but the first law reminds us there is no one-size-fits-all in software architecture. No silver bullets, no magic frameworks, no perfect patterns. Everything is a trade-off."
+
+  - name: "Nerd Corner"
+    type: "nerd"
+    cards:
+      - title: "What does Valhalla mean?"
+        text: "In Old Norse, Valhalla means \"Hall of the Slain\": Odin's hall in Asgard where warriors fallen in battle feast and fight until Ragnarok. The Java team chose the name because the project aims to resurrect Java's performance model. The original slogan was \"codes like a class, works like an int.\""
+      - title: "The hyper lesson"
+        text: "Cloudflare's hyper bug is a masterclass in debugging distributed systems. A faster Unix socket architecture exposed a timing-sensitive truncation bug caused by a discarded pending flush. The fix was tiny, but finding it took weeks because observing the bug changed its timing."

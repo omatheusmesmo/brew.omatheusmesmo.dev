@@ -1,0 +1,24 @@
+---
+layout: base
+tagging: brews
+---
+
+<div class="brew-column">
+  <header class="brew-header">
+    <div class="brew-masthead">
+      <p class="brew-title">Matheus' Brew</p>
+      <div class="brew-divider"></div>
+      <p class="brew-tagline">Tag: {page.data.tag}</p>
+    </div>
+  </header>
+
+  <div class="brew-content">
+    {#for post in site.collections.get(page.data.tagCollection).sortByDate(true)}
+      <article class="brew-card">
+        <p class="card-date">{post.date.format('MMM d, yyyy')}</p>
+        <h3 class="card-title"><a href="{post.url}">{post.title}</a></h3>
+        <p class="card-desc">{post.description}</p>
+      </article>
+    {/for}
+  </div>
+</div>

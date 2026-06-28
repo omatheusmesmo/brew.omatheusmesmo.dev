@@ -1,0 +1,52 @@
+name: Brew Newsletter
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "data/brews/**"
+  workflow_dispatch:
+    inputs:
+      brew_file:
+        description: "Brew file to send (e.g. 2026-07-01). Leave empty to auto-detect from git diff."
+        required: false
+        type: string
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detect changed brew
+        id: detect
+        run: |
+          if [ -n "${{ inputs.brew_file }}" ]; then
+            echo "slug=${{ inputs.brew_file }}" >> $GITHUB_OUTPUT
+          else
+            CHANGED=$(git diff --name-only HEAD~1 -- data/brews/ | grep '\.yml$' | head -1)
+            if [ -n "$CHANGED" ]; then
+              SLUG=$(basename "$CHANGED" .yml)
+              echo "slug=$SLUG" >> $GITHUB_OUTPUT
+            else
+              echo "No brew changes detected"
+              exit 0
+            fi
+          fi
+
+      - name: Generate Roq Site
+        uses: quarkiverse/quarkus-roq@v1.1
+        with:
+          java-version: "25"
+          maven-executable: mvn
+          github-pages: "false"
+          site-future: "true"
+
+      - name: Schedule email
+        run: chmod +x scripts/send-newsletter && scripts/send-newsletter --schedule ${{ steps.detect.outputs.slug }}
+        env:
+          MAILERLITE_API_KEY: ${{ secrets.MAILERLITE_API_KEY }}
+          MAILERLITE_GROUP_ID: ${{ secrets.MAILERLITE_GROUP_ID }}

@@ -1,0 +1,107 @@
+---
+layout: base
+---
+
+<div class="brew-column">
+    <header class="brew-header">
+        <div class="brew-masthead">
+            <p class="brew-title">Matheus' Brew</p>
+            {#if page.data.issue}
+            <span class="brew-issue">#{page.data.issue}</span>
+            {/if}
+            <div class="brew-divider"></div>
+            {#if page.data.description}
+            <p class="brew-tagline">{page.data.description}</p>
+            {/if}
+        </div>
+    </header>
+
+    <div class="brew-content">
+        {#for section in page.data.validateSections}
+            <h2 data-section="{section.name.slugify.toLowerCase}">{section.name}</h2>
+            {#for card in section.cards}
+                {#if section.type is "nerd"}
+                <div class="nerd-corner brew-card">
+                    <p class="nerd-title">{card.title}</p>
+                    <p class="nerd-text">{card.text}</p>
+                </div>
+                {#else if section.type is "highlight"}
+                <div class="highlight-card brew-card">
+                    {#if section.badge}
+                    <span class="highlight-badge">{section.badge}</span>
+                    {/if}
+                    <p class="link-title">{card.title}</p>
+                    {#if card.containsKey('url')}
+                    <p class="link-url"><a href="{card.url}">{card.containsKey('source') ? card.source : card.url}</a></p>
+                    {/if}
+                    <p class="link-description">{card.description}</p>
+                </div>
+                {#else}
+                <div class="brew-card">
+                    <p class="link-title">{card.title}</p>
+                    {#if card.containsKey('url')}
+                    <p class="link-url"><a href="{card.url}">{card.containsKey('source') ? card.source : card.url}</a></p>
+                    {/if}
+                    <p class="link-description">{card.description}</p>
+                </div>
+                {/if}
+                {#if card.containsKey('comment')}
+                <div class="comment-bubble-container">
+                    <img src="/images/matheus-oliveira.jpg" alt="Matheus Oliveira" class="comment-avatar">
+                    <div class="comment-bubble">{card.comment}</div>
+                </div>
+                {/if}
+            {/for}
+        {/for}
+    </div>
+
+    <section class="giscus-comments">
+        <h2>Comments</h2>
+        <div id="giscus-container"></div>
+        <script>
+            function setGiscusTheme() {
+                const theme = document.documentElement.getAttribute('data-theme') || 'light';
+                const giscusFrame = document.querySelector('iframe.giscus-frame');
+                if (giscusFrame) {
+                    giscusFrame.content.postMessage({
+                        giscus: {
+                            setConfig: {
+                                theme: theme
+                            }
+                        }
+                    }, 'https://giscus.app');
+                }
+            }
+
+            function loadGiscus() {
+                const script = document.createElement('script');
+                script.src = 'https://giscus.app/client.js';
+                script.setAttribute('data-repo', 'omatheusmesmo/brew.omatheusmesmo.dev');
+                script.setAttribute('data-repo-id', '');
+                script.setAttribute('data-category', 'Announcements');
+                script.setAttribute('data-category-id', '');
+                script.setAttribute('data-mapping', 'pathname');
+                script.setAttribute('data-strict', '0');
+                script.setAttribute('data-reactions-enabled', '1');
+                script.setAttribute('data-emit-metadata', '0');
+                script.setAttribute('data-input-position', 'bottom');
+                script.setAttribute('data-theme', document.documentElement.getAttribute('data-theme') || 'light');
+                script.setAttribute('data-lang', 'en');
+                script.crossOrigin = 'anonymous';
+                script.async = true;
+                document.getElementById('giscus-container').appendChild(script);
+            }
+
+            document.addEventListener('DOMContentLoaded', loadGiscus);
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="https://giscus.app/">comments powered by Giscus.</a></noscript>
+    </section>
+
+    <div class="brew-footer">
+        <a href="https://github.com/omatheusmesmo" class="brewed-by" target="_blank" rel="noopener">
+            <img src="/images/matheus-oliveira.jpg"
+                 alt="Matheus Oliveira" class="brewed-avatar" />
+            <p class="brewed-label">Brewed with ☕ by <span class="brewed-name">Matheus Oliveira</span></p>
+        </a>
+    </div>
+</div>

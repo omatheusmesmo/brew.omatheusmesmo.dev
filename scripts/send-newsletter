@@ -1,0 +1,208 @@
+#!/usr/bin/env -S java --source 25
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+public class SendBrew {
+
+    private static final String BREW_URL = "https://brew.omatheusmesmo.dev";
+
+    public static void main(String[] args) throws Exception {
+        String apiKey = System.getenv("MAILERLITE_API_KEY");
+        String groupId = System.getenv().getOrDefault("MAILERLITE_GROUP_ID", "");
+        boolean schedule = false;
+        String brewSlug = null;
+
+        for (int i = 0; i < args.length; i++) {
+            if ("--schedule".equals(args[i])) {
+                schedule = true;
+            } else {
+                brewSlug = args[i];
+            }
+        }
+
+        if (brewSlug == null) brewSlug = findLatestBrew();
+        if (brewSlug == null) { System.err.println("No brew found"); System.exit(1); }
+
+        String datePath = brewSlug.replace("-", "/");
+        String discussUrl = BREW_URL + "/brews/" + datePath + "/";
+
+        Path rendered = Path.of("target/roq/brews/" + datePath + "/index.html");
+        if (!Files.exists(rendered)) {
+            System.err.println("Rendered HTML not found: " + rendered);
+            System.err.println("Run: mvn package -DskipTests -Dsite.future=true");
+            System.exit(1);
+        }
+        String pageHtml = Files.readString(rendered);
+
+        String title = extractBetween(pageHtml, "<title>Matheus' Brew | ", "</title>");
+        if (title.isEmpty()) title = extractBetween(pageHtml, "<title>", "</title>");
+
+        String css = readCss();
+        String content = extractContent(pageHtml);
+
+        String emailHtml = buildEmail(title, css, content, discussUrl);
+        Files.createDirectories(Path.of("target"));
+        Files.writeString(Path.of("target/brew-email.html"), emailHtml);
+        System.out.println("Email saved: target/brew-email.html  (" + emailHtml.length() + " bytes)");
+
+        if (apiKey != null && !apiKey.isBlank()) {
+            String brewDate = schedule ? readBrewDate(brewSlug) : null;
+            sendToMailerLite(apiKey, groupId, title, emailHtml, schedule, brewDate);
+        }
+    }
+
+    private static String findLatestBrew() throws IOException {
+        Path dir = Path.of("data/brews");
+        if (!Files.isDirectory(dir)) return null;
+        try (var files = Files.list(dir)) {
+            return files.filter(f -> f.toString().endsWith(".yml"))
+                .map(p -> p.getFileName().toString().replace(".yml", ""))
+                .sorted(java.util.Comparator.reverseOrder())
+                .findFirst().orElse(null);
+        }
+    }
+
+    private static String readCss() throws IOException {
+        Path cssFile = Path.of("target/roq/static/bundle/app.css");
+        if (Files.exists(cssFile)) return Files.readString(cssFile);
+        cssFile = Path.of("web/app.css");
+        if (Files.exists(cssFile)) return Files.readString(cssFile);
+        return "";
+    }
+
+    private static String extractContent(String html) {
+        int colStart = html.indexOf("<div class=\"brew-column\">");
+        if (colStart < 0) return "";
+        int end = html.indexOf("<section class=\"giscus-comments\">");
+        if (end < 0) end = html.indexOf("<div class=\"brew-footer\">");
+        if (end < 0) end = html.length();
+        String content = html.substring(colStart, end);
+
+        // Fix relative URLs for email
+        content = content.replace("src=\"/images/", "src=\"" + BREW_URL + "/images/");
+
+        return content;
+    }
+
+    private static String buildEmail(String title, String css, String content, String discussUrl) {
+        return "<!DOCTYPE html>"
+            + "<html lang=\"en\" xmlns=\"http://www.w3.org/1999/xhtml\" xmlns:v=\"urn:schemas-microsoft-com:vml\" xmlns:o=\"urn:schemas-microsoft-com:office:office\">"
+            + "<head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1.0\">"
+            + "<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">"
+            + "<meta name=\"x-apple-disable-message-reformatting\">"
+            + "<title>" + h(title) + "</title>"
+            + "<!--[if mso]><noscript><xml><o:OfficeDocument><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocument></xml></noscript><![endif]-->"
+            + "<style>" + css + "</style></head>"
+            + "<body style=\"margin:0;padding:0;background-color:#FAF8F5;font-family:Georgia,'Times New Roman',Times,serif\">"
+            + "<center>"
+            + "<table role=\"presentation\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\" width=\"100%\" style=\"background-color:#FAF8F5\">"
+            + "<tr><td style=\"padding:32px 16px\">"
+            + "<table role=\"presentation\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\" width=\"100%\" style=\"max-width:600px;margin:0 auto\">"
+            + "<tr><td style=\"font-size:0\">"
+            + content
+            + "</td></tr>"
+            + "<tr><td style=\"padding:24px 24px 24px 24px;text-align:center\">"
+            + "<a href=\"" + discussUrl + "\" style=\"display:inline-block;background:linear-gradient(135deg,#B07219 0%,#8C5A14 100%);color:#FFFFFF;font-size:15px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:8px\">Discuss this brew</a>"
+            + "</td></tr>"
+            + "<tr><td style=\"padding:0 24px\"><table role=\"presentation\" cellspacing=\"0\" cellpadding=\"0\" border=\"0\" width=\"100%\"><tr><td style=\"border-top:1px solid #EDE8E1\"></td></tr></table></td></tr>"
+            + "<tr><td style=\"background:#FAF8F5;padding:24px 32px 28px 32px;border-top:1px solid #EDE8E1\">"
+            + "<p style=\"font-family:Georgia,'Times New Roman',Times,serif;margin:0 0 4px;color:#9C8E7E;font-size:12px\">Best regards,</p>"
+            + "<p style=\"font-family:Georgia,'Times New Roman',Times,serif;margin:0 0 16px;color:#2C2417;font-size:15px;font-weight:700\">Matheus Oliveira</p>"
+            + "<a href=\"" + BREW_URL + "\" style=\"color:#B07219;text-decoration:none;font-size:12px;font-weight:500\">Brew</a> "
+            + "<span style=\"color:#D6CFC5;margin:0 8px\">·</span> "
+            + "<a href=\"https://github.com/omatheusmesmo\" style=\"color:#B07219;text-decoration:none;font-size:12px;font-weight:500\">GitHub</a> "
+            + "<span style=\"color:#D6CFC5;margin:0 8px\">·</span> "
+            + "<a href=\"https://linkedin.com/in/omatheusmesmo\" style=\"color:#B07219;text-decoration:none;font-size:12px;font-weight:500\">LinkedIn</a>"
+            + "<p style=\"font-family:Georgia,'Times New Roman',Times,serif;margin:20px 0 0;color:#9C8E7E;font-size:11px\">"
+            + "<a href=\"{$unsubscribe}\" style=\"color:#B07219;text-decoration:underline\">Unsubscribe</a>"
+            + " · <a href=\"{$url}\" style=\"color:#B07219;text-decoration:underline\">View in browser</a>"
+            + "</p></td></tr>"
+            + "</table></td></tr></table></center></body></html>";
+    }
+
+    private static String extractBetween(String text, String start, String end) {
+        int s = text.indexOf(start);
+        if (s < 0) return "";
+        s += start.length();
+        int e = text.indexOf(end, s);
+        if (e < 0) return "";
+        return text.substring(s, e);
+    }
+
+    private static String h(String s) {
+        if (s == null) return "";
+        return s.replace("&", "&amp;").replace("<", "&lt;")
+                .replace(">", "&gt;").replace("\"", "&quot;");
+    }
+
+    private static void sendToMailerLite(String apiKey, String groupId, String title,
+                                          String html, boolean schedule, String brewDate) throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+        String body = "{\"name\":\"Brew: " + escJson(title) + "\","
+            + "\"type\":\"regular\","
+            + "\"emails\":[{\"subject\":\"Matheus' Brew: " + escJson(title) + "\","
+            + "\"from_name\":\"Matheus Oliveira\","
+            + "\"from\":\"hi@omatheusmesmo.dev\","
+            + "\"content\":\"" + escJson(html) + "\"}],"
+            + "\"groups\":[" + (groupId.isEmpty() ? "" : "\"" + groupId + "\"") + "]}";
+
+        HttpRequest req = HttpRequest.newBuilder()
+            .uri(URI.create("https://connect.mailerlite.com/api/campaigns"))
+            .header("Authorization", "Bearer " + apiKey)
+            .header("Content-Type", "application/json")
+            .POST(HttpRequest.BodyPublishers.ofString(body))
+            .build();
+        HttpResponse<String> res = client.send(req, HttpResponse.BodyHandlers.ofString());
+        System.out.println("Campaign: " + res.statusCode());
+
+        if (res.statusCode() >= 400) {
+            System.err.println(res.body());
+            System.exit(1);
+        }
+
+        String id = res.body().replaceAll(".*\"id\"\\s*:\\s*\"(\\d+)\".*", "$1");
+        System.out.println("Campaign ID: " + id);
+
+        String scheduleBody;
+        if (schedule && brewDate != null && !brewDate.isEmpty()) {
+            scheduleBody = "{\"delivery\":\"scheduled\",\"schedule\":{\"date\":\"" + brewDate
+                + "\",\"hours\":\"14\",\"minutes\":\"00\"}}";
+            System.out.println("Scheduling for: " + brewDate + " 14:00 UTC");
+        } else {
+            scheduleBody = "{\"delivery\":\"instant\"}";
+        }
+
+        HttpRequest sch = HttpRequest.newBuilder()
+            .uri(URI.create("https://connect.mailerlite.com/api/campaigns/" + id + "/schedule"))
+            .header("Authorization", "Bearer " + apiKey)
+            .header("Content-Type", "application/json")
+            .POST(HttpRequest.BodyPublishers.ofString(scheduleBody))
+            .build();
+        HttpResponse<String> schRes = client.send(sch, HttpResponse.BodyHandlers.ofString());
+        System.out.println("Schedule: " + schRes.statusCode() + " " + schRes.body());
+    }
+
+    private static String readBrewDate(String slug) throws IOException {
+        Path yml = Path.of("data/brews/" + slug + ".yml");
+        if (!Files.exists(yml)) return null;
+        String content = Files.readString(yml);
+        for (String line : content.split("\n")) {
+            if (line.startsWith("date:")) {
+                return line.substring(5).trim();
+            }
+        }
+        return null;
+    }
+
+    private static String escJson(String s) {
+        if (s == null) return "";
+        return s.replace("\\", "\\\\").replace("\"", "\\\"")
+                .replace("\n", "\\n").replace("\r", "");
+    }
+}
