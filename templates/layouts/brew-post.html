@@ -84,7 +84,7 @@ layout: base
                     script.setAttribute('data-reactions-enabled', '1');
                     script.setAttribute('data-emit-metadata', '0');
                     script.setAttribute('data-input-position', 'top');
-                    script.setAttribute('data-theme', 'preferred_color_scheme');
+                    script.setAttribute('data-theme', document.documentElement.getAttribute('data-theme') || 'light');
                     script.setAttribute('data-lang', 'en');
                     script.setAttribute('data-loading', 'lazy');
                     script.crossOrigin = 'anonymous';
@@ -98,7 +98,7 @@ layout: base
         </section>
 
         <section class="brew-subscribe">
-            <div id="mlb2-2458660-191556554578723917" class="ml-form-embed"></div>
+            <div class="ml-embedded" data-form="W60iXT"></div>
         </section>
 
         <div class="brew-footer">
