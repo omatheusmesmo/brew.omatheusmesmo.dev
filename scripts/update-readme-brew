@@ -1,0 +1,116 @@
+#!/usr/bin/env -S java --source 25
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
+
+public class UpdateReadmeBrew {
+
+    private static final String BREWS_DIR = "data/brews";
+    private static final String README_PATH = System.getenv().getOrDefault("README_PATH", "profile-repo/README.md");
+    private static final String BREW_URL = "https://brew.omatheusmesmo.dev";
+
+    private static final String BREW_START = "<!-- BREW-LIST:START -->";
+    private static final String BREW_END = "<!-- BREW-LIST:END -->";
+
+    public static void main(String[] args) throws Exception {
+        if (!Files.exists(Path.of(README_PATH))) {
+            System.err.println("README not found at " + README_PATH);
+            System.exit(1);
+        }
+
+        String readme = Files.readString(Path.of(README_PATH));
+        readme = updateBrewSection(readme);
+        Files.writeString(Path.of(README_PATH), readme);
+        System.out.println("README updated successfully");
+    }
+
+    private static String updateBrewSection(String readme) throws Exception {
+        List<BrewEdition> editions = getPublishedEditions();
+        if (editions.isEmpty()) {
+            return replaceSection(readme, BREW_START, BREW_END, "");
+        }
+
+        BrewEdition latest = editions.get(0);
+        StringBuilder sb = new StringBuilder();
+        sb.append("- **[").append(latest.title).append("](").append(BREW_URL)
+          .append(latest.link).append(")**  \n");
+        sb.append("  ").append(latest.description).append("\n");
+
+        if (editions.size() > 1) {
+            List<BrewEdition> archived = editions.subList(1, editions.size());
+            sb.append("\n<details>\n<summary>📂 <b>View all editions (")
+              .append(archived.size()).append(" more)</b></summary>\n\n");
+            for (BrewEdition e : archived) {
+                sb.append("- [").append(e.title).append("](").append(BREW_URL)
+                  .append(e.link).append(")\n");
+            }
+            sb.append("</details>");
+        }
+
+        return replaceSection(readme, BREW_START, BREW_END, sb.toString().trim());
+    }
+
+    private static List<BrewEdition> getPublishedEditions() throws Exception {
+        Path brewsDir = Path.of(BREWS_DIR);
+        if (!Files.isDirectory(brewsDir)) return List.of();
+
+        List<BrewEdition> editions = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+
+        try (Stream<Path> files = Files.list(brewsDir)) {
+            files.filter(p -> p.toString().endsWith(".yml")).forEach(file -> {
+                try {
+                    String content = Files.readString(file);
+
+                    String title = extractYamlField(content, "title");
+                    String description = extractYamlField(content, "description");
+                    String dateStr = extractYamlField(content, "date");
+                    String link = extractYamlField(content, "link");
+
+                    if (title == null || description == null || dateStr == null || link == null) return;
+
+                    LocalDate date = LocalDate.parse(dateStr.trim());
+
+                    if (date.isAfter(today)) return;
+
+                    editions.add(new BrewEdition(title, description, date, link));
+                } catch (Exception e) {
+                    System.err.println("Error parsing " + file + ": " + e.getMessage());
+                }
+            });
+        }
+
+        editions.sort(Comparator.comparing((BrewEdition e) -> e.date).reversed());
+        return editions;
+    }
+
+    private static String replaceSection(String content, String startMarker, String endMarker, String newContent) {
+        Pattern pattern = Pattern.compile(Pattern.quote(startMarker) + "[\\s\\S]*?" + Pattern.quote(endMarker));
+        Matcher matcher = pattern.matcher(content);
+        if (matcher.find()) {
+            return matcher.replaceFirst(startMarker + "\n\n" + newContent + "\n\n" + endMarker);
+        }
+        System.err.println("Markers not found: " + startMarker + " / " + endMarker);
+        return content;
+    }
+
+    private static String extractYamlField(String content, String field) {
+        Pattern pattern = Pattern.compile("^" + field + ":\\s*\"(.+?)\"", Pattern.MULTILINE);
+        Matcher matcher = pattern.matcher(content);
+        if (matcher.find()) return matcher.group(1);
+
+        pattern = Pattern.compile("^" + field + ":\\s*(.+)$", Pattern.MULTILINE);
+        matcher = pattern.matcher(content);
+        if (matcher.find()) return matcher.group(1).trim();
+        return null;
+    }
+
+    record BrewEdition(String title, String description, LocalDate date, String link) {}
+}

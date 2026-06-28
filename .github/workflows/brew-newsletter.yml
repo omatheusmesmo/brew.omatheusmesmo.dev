@@ -3,17 +3,16 @@ name: Brew Newsletter
 on:
   push:
     branches: [main]
-    paths:
-      - "data/brews/**"
+    paths: ['data/brews/*.yml']
   workflow_dispatch:
     inputs:
-      brew_file:
-        description: "Brew file to send (e.g. 2026-07-01). Leave empty to auto-detect from git diff."
+      brew_slug:
+        description: 'Brew slug to send (e.g. 2026-07-01). Leave empty to auto-detect from changed files.'
         required: false
         type: string
 
 jobs:
-  send:
+  schedule:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -21,32 +20,50 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: Detect changed brew
-        id: detect
+      - name: Generate Roq Site (future enabled)
+        uses: quarkiverse/quarkus-roq@v1.1
+        with:
+          github-pages: false
+          site-future: "true"
+
+      - name: Setup Java 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+
+      - name: Determine brew slug
+        id: brew
         run: |
-          if [ -n "${{ inputs.brew_file }}" ]; then
-            echo "slug=${{ inputs.brew_file }}" >> $GITHUB_OUTPUT
-          else
-            CHANGED=$(git diff --name-only HEAD~1 -- data/brews/ | grep '\.yml$' | head -1)
+          if [ -n "${{ inputs.brew_slug }}" ]; then
+            echo "slug=${{ inputs.brew_slug }}" >> $GITHUB_OUTPUT
+            echo "send=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          if git rev-parse HEAD~1 >/dev/null 2>&1; then
+            CHANGED=$(git diff --name-only HEAD~1 -- data/brews/*.yml | head -1)
             if [ -n "$CHANGED" ]; then
               SLUG=$(basename "$CHANGED" .yml)
               echo "slug=$SLUG" >> $GITHUB_OUTPUT
+              echo "send=true" >> $GITHUB_OUTPUT
             else
-              echo "No brew changes detected"
-              exit 0
+              echo "send=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            LATEST=$(ls data/brews/*.yml 2>/dev/null | sort -r | head -1)
+            if [ -n "$LATEST" ]; then
+              SLUG=$(basename "$LATEST" .yml)
+              echo "slug=$SLUG" >> $GITHUB_OUTPUT
+              echo "send=true" >> $GITHUB_OUTPUT
+            else
+              echo "send=false" >> $GITHUB_OUTPUT
             fi
           fi
 
-      - name: Generate Roq Site
-        uses: quarkiverse/quarkus-roq@v1.1
-        with:
-          java-version: "25"
-          maven-executable: mvn
-          github-pages: "false"
-          site-future: "true"
-
       - name: Schedule email
-        run: chmod +x scripts/send-newsletter && scripts/send-newsletter --schedule ${{ steps.detect.outputs.slug }}
+        if: steps.brew.outputs.send == 'true'
+        run: chmod +x scripts/send-newsletter && scripts/send-newsletter --schedule ${{ steps.brew.outputs.slug }}
         env:
           MAILERLITE_API_KEY: ${{ secrets.MAILERLITE_API_KEY }}
           MAILERLITE_GROUP_ID: ${{ secrets.MAILERLITE_GROUP_ID }}

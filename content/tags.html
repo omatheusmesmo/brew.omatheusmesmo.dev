@@ -15,12 +15,14 @@ layout: base
 
   <div class="brew-content">
     <div class="tag-cloud">
-      {#for tag in site.collections.brews.tagsCount}
-        <a href="/brews/tag/{tag.name}/" class="tag-chip">
-          {tag.name}
-          <span class="tag-count">{tag.count}</span>
-        </a>
-      {/for}
+      {#if site.collections.brews}
+        {#for tag in site.collections.brews.tagsCount}
+          <a href="/brews/tag/{tag.name}/" class="tag-chip">
+            {tag.name}
+            <span class="tag-count">{tag.count}</span>
+          </a>
+        {/for}
+      {/if}
     </div>
   </div>
 </div>

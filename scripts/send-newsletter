@@ -169,8 +169,15 @@ public class SendBrew {
         String id = res.body().replaceAll(".*\"id\"\\s*:\\s*\"(\\d+)\".*", "$1");
         System.out.println("Campaign ID: " + id);
 
+        if (schedule) {
+            if (brewDate == null || brewDate.isEmpty()) {
+                System.err.println("ERROR: --schedule requires a valid date in the brew YAML");
+                System.exit(1);
+            }
+        }
+
         String scheduleBody;
-        if (schedule && brewDate != null && !brewDate.isEmpty()) {
+        if (schedule) {
             scheduleBody = "{\"delivery\":\"scheduled\",\"schedule\":{\"date\":\"" + brewDate
                 + "\",\"hours\":\"14\",\"minutes\":\"00\"}}";
             System.out.println("Scheduling for: " + brewDate + " 14:00 UTC");

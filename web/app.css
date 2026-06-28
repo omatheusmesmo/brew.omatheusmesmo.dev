@@ -190,12 +190,14 @@ a:hover { color: var(--brew-primary-dark); }
 }
 
 .brew-content {
-    padding: 2px 24px;
+    padding: 0 24px 20px;
 }
 
 /* Brewed By Footer */
 .brew-footer {
-    padding: 0 24px 24px;
+    margin-top: 24px;
+    padding: 24px 0 0;
+    border-top: 1px solid var(--brew-border);
 }
 
 .brewed-by {
@@ -232,11 +234,14 @@ h2 {
     font-size: 15px;
     font-weight: 700;
     color: var(--brew-primary);
-    margin: 20px 0 12px 0;
-    padding-bottom: 6px;
-    border-bottom: 2px solid var(--brew-border);
+    margin: 28px 0 12px 0;
     text-transform: uppercase;
     letter-spacing: 2px;
+}
+
+h2[data-section] {
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--brew-border);
 }
 
 h2[data-section="highlight"]::before { content: "🔥 "; }
@@ -247,8 +252,6 @@ h2[data-section="languages-frameworks"]::before { content: "💻 "; }
 h2[data-section="books-insights"]::before { content: "📖 "; }
 h2[data-section="videos"]::before { content: "🎬 "; }
 h2[data-section="nerd-corner"]::before { content: "🧠 "; }
-
-.giscus-comments h2::before { content: "💬 "; }
 
 /* Shared Card Base */
 .brew-card {
@@ -492,34 +495,64 @@ h2[data-section="nerd-corner"]::before { content: "🧠 "; }
     padding: 1px 6px;
     border-radius: 10px;
 }
+.view-all-container {
+    margin: 24px 0 12px;
+    text-align: center;
+}
+
 .cta-button {
     display: inline-block;
-    background: linear-gradient(135deg, var(--brew-primary) 0%, var(--brew-primary-dark) 100%);
-    color: white;
-    padding: 14px 32px;
+    color: var(--brew-primary);
+    background: transparent;
+    border: 1.5px solid var(--brew-primary);
+    padding: 10px 20px;
     border-radius: 8px;
     text-decoration: none;
-    font-weight: 700;
-    font-size: 15px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: background 0.2s, color 0.2s;
 }
 
 .cta-button:hover {
+    background: var(--brew-primary);
     color: white;
+}
+
+/* Newsletter Signup */
+.brew-subscribe {
+    margin-top: 0;
+    padding: 24px;
+    background: var(--brew-card-bg);
+    border: 1px solid var(--brew-border);
+    border-radius: 12px;
+    text-align: center;
+}
+
+[data-theme="dark"] .brew-subscribe {
+    background: #F5F0EB;
+    border-color: #EDE8E1;
+}
+
+/* Homepage section headers */
+.section-header {
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--brew-border);
 }
 
 /* Giscus Comments Section */
 .giscus-comments {
-    padding: 0 24px 24px;
-    border-top: 0;
+    margin-top: 32px;
+    padding: 24px 0 0;
+    border-top: 1px solid var(--brew-border);
 }
 
 .giscus-comments h2 {
     font-size: 20px;
     margin-bottom: 16px;
     color: var(--brew-primary-dark);
-    border-top: 2px solid var(--brew-border);
-    padding-top: 20px;
 }
+
+.giscus-comments h2::before { content: "💬 "; }
 
 .giscus-comments iframe {
     width: 100%;
