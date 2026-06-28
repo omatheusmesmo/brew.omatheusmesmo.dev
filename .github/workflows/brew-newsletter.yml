@@ -20,17 +20,14 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: Generate Roq Site (future enabled)
-        uses: quarkiverse/quarkus-roq@v1.1
-        with:
-          github-pages: false
-          site-future: "true"
-
       - name: Setup Java 25
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '25'
+
+      - name: Build site (future enabled)
+        run: QUARKUS_ROQ_GENERATOR_BATCH=true mvn package quarkus:run -DskipTests -Dsite.future=true
 
       - name: Determine brew slug
         id: brew
