@@ -166,7 +166,23 @@ public class SendBrew {
             System.exit(1);
         }
 
-        String id = res.body().replaceAll(".*\"id\"\\s*:\\s*\"(\\d+)\".*", "$1");
+        String responseBody = res.body();
+        String id = "";
+        int dataIdx = responseBody.indexOf("\"data\"");
+        if (dataIdx >= 0) {
+            int idIdx = responseBody.indexOf("\"id\"", dataIdx);
+            if (idIdx >= 0) {
+                int valStart = responseBody.indexOf("\"", responseBody.indexOf(":", idIdx) + 1);
+                if (valStart >= 0 && responseBody.charAt(valStart) == '"') {
+                    int valEnd = responseBody.indexOf("\"", valStart + 1);
+                    if (valEnd >= 0) id = responseBody.substring(valStart + 1, valEnd);
+                }
+            }
+        }
+        if (id.isEmpty()) {
+            System.err.println("Could not extract campaign ID from response: " + responseBody);
+            System.exit(1);
+        }
         System.out.println("Campaign ID: " + id);
 
         if (schedule) {
